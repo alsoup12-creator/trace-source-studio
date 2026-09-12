@@ -1,0 +1,32 @@
+select {
+  width: 100%;
+  border: 1px solid #cfd8d2;
+  border-radius: 10px;
+  background: #fff;
+  padding: 12px 13px;
+  margin-top: 6px;
+  font: inherit;
+}
+
+.settings-group {
+  border: 1px solid #dbe2dc;
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #fff;
+}
+
+.dialog-card h3 {
+  margin: 18px 0 6px;
+  color: #315247;
+}
+
+.check-line {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.check-line input {
+  width: auto !important;
+  margin: 0 !important;
+}

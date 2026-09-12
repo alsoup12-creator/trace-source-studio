@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>溯源台</title>
+  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/metaso.css">
+  <link rel="stylesheet" href="/interaction.css">
+  <link rel="stylesheet" href="/review-ui.css">
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">源</span><div><strong>溯源台</strong><small>机器负责找，人负责判</small></div></div>
+      <div class="project-title" id="project-title">尚未导入成品</div>
+      <div class="top-actions"><button class="button quiet hidden" id="back-button">返回重选</button><button class="button quiet" id="settings-button">接口设置</button><button class="button primary" id="run-button" disabled>开始溯源</button></div>
+    </header>
+
+    <main id="welcome" class="welcome">
+      <section class="welcome-copy">
+        <span class="eyebrow">独立的成品溯源工具</span>
+        <h1>把成品观点和<br>来源原文摆在一起。</h1>
+        <p>导入 Word、PPT、Excel 或图片，工具按原文、工作表行或 OCR 结果提取可溯源观点，再从网站、MCP或指定本地文件夹寻找候选原文。工具只负责查找和对齐，最终判断留给人。</p>
+        <div class="import-row"><input id="artifact-path" placeholder="选择或粘贴 .docx / .pptx / .xlsx / .xlsm / 图片文件路径"><button class="button quiet" id="choose-artifact">选择文件</button><button class="button primary" id="import-button">导入成品</button></div>
+        <div class="boundary"><span>原件保持不变</span><span>Word 可输出修订副本</span><span>找不到就标记待查</span></div>
+      </section>
+      <section class="welcome-visual">
+        <div class="mini-card"><small>成品观点</small><b>付款期限为验收后十日内</b></div>
+        <div class="trace-line"></div>
+        <div class="mini-card source"><small>候选来源 · 合同第8.2条</small><b>“甲方应在验收完成后十日内支付……”</b><span>打开原件 ↗</span></div>
+      </section>
+    </main>
+
+    <main id="workspace" class="workspace hidden">
+      <aside class="claims-panel question-panel">
+        <div class="panel-head"><div><small>段落问答</small><strong id="question-title">先在中间选择一个段落</strong></div></div>
+        <details id="question-context" class="question-context">
+          <summary><span>当前段落原文</span><span id="question-context-meta">点击展开</span></summary>
+          <p id="question-context-text">选中段落后，可通过已配置的 API 或 MCP 单独提问。问答不会改写原文，也不会影响右侧本地文件溯源。</p>
+        </details>
+        <div id="question-history" class="question-history"><div class="question-empty">尚未选择段落。</div></div>
+        <form id="question-form" class="question-form">
+          <label>提问方式</label>
+          <div class="question-provider-buttons" role="group" aria-label="提问方式">
+            <button type="button" class="question-provider active" data-question-provider="api">兼容 API</button>
+            <button type="button" class="question-provider" data-question-provider="metaso">秘塔问答</button>
+            <button type="button" class="question-provider" data-question-provider="mcp">通用 MCP</button>
+            <button type="button" class="question-provider" data-question-provider="pkulaw">北大法宝</button>
+          </div>
+          <textarea id="question-input" rows="4" placeholder="例如：这段话的关键条件是什么？按 Enter 发送，Shift+Enter 换行。"></textarea>
+          <button type="submit" class="button primary" id="question-submit" disabled>发送问题</button>
+        </form>
+      </aside>
+      <section class="artifact-panel">
+        <div class="panel-head"><div><small id="artifact-kind">成品原文</small><strong id="artifact-name"></strong><span id="structure-status" class="structure-status"></span><span id="revision-status" class="revision-status"></span></div><div class="artifact-panel-actions"><button class="button quiet small" id="semantic-structure">AI 智能细分</button><button class="button revision-action small" id="export-revision" hidden>生成修订副本</button><button class="button quiet small" id="open-revision-copy" hidden>打开修订副本</button><button class="button quiet small" id="open-artifact">打开原件</button></div></div>
+        <article id="artifact" class="paper"></article>
+      </section>
+      <aside class="sources-panel">
+        <div class="panel-head"><div><small>来源与依据</small><strong id="source-heading">选择一个观点</strong></div></div>
+        <div id="source-filters" class="legend source-filters"></div>
+        <div id="sources" class="sources empty">从左侧选择观点，这里会显示候选原文、位置和上下文。</div>
+      </aside>
+    </main>
+  </div>
+
+  <dialog id="run-dialog">
+    <form method="dialog" class="dialog-card wide">
+      <header><div><small>本次任务说明</small><h2 id="run-dialog-title">开始溯源</h2></div><button class="icon-button" value="cancel">×</button></header>
+      <label>补充内容和结构提示<textarea id="run-prompt" rows="6" placeholder="例如：重点查金额、日期和违约责任；金额和日期分别拆分；法律依据优先现行有效规定。"></textarea></label>
+      <div class="hint">本次提示只调整检索重点和结构，不会覆盖“不判断、不改写、不把搜索摘要当原文”等内置规则。</div>
+      <p id="run-dialog-error" class="dialog-error" hidden></p>
+      <div class="source-modes">
+        <label class="mode-card"><input type="checkbox" id="mode-local" checked><span><b>本地文件夹</b><small>用文本提取、关键词和数字匹配检索 Word、PPT、PDF、文本和表格</small></span></label>
+        <label class="mode-card"><input type="checkbox" id="mode-web"><span><b>网站检索</b><small>查找网页候选，打开网页后再核对原文</small></span></label>
+        <label class="mode-card"><input type="checkbox" id="mode-mcp"><span><b>MCP资料库</b><small>使用接口设置中配置的MCP工具</small></span></label>
+        <label class="mode-card"><input type="checkbox" id="mode-pkulaw"><span><b>北大法宝</b><small>直接调用法宝 MCP 检索法律法规候选</small></span></label>
+      </div>
+      <label class="check-line"><input type="checkbox" id="mode-local-ai">启用本地 AI 精筛（规则宽召回；AI分为主要候选、可能冲突和折叠线索；强匹配不足时同时扩展检索词）</label>
+      <label class="check-line"><input type="checkbox" id="allow-local-online-summary">允许将本地候选片段发送给秘塔进行来源汇总（默认关闭）</label>
+      <label class="check-line understanding-toggle"><input type="checkbox" id="mode-understanding" checked>启用秘塔理解层：联网检索时拆分观点并生成检索问题（仅本地文件时自动跳过）</label>
+      <label>本地来源文件夹<div class="path-row"><input id="source-folder" placeholder="选择或粘贴文件夹路径"><button type="button" class="button quiet" id="choose-folder">选择文件夹</button></div></label>
+      <div class="hint">PNG/JPG 和图片型 PDF 会进入 OCR；未安装 requirements-ocr.txt、Tesseract 和 chi_sim 中文语言包时，图片会被跳过并在日志中说明。</div>
+      <footer><button class="button quiet" value="cancel">取消</button><button type="button" class="button primary" id="confirm-run">开始查找候选来源</button></footer>
+    </form>
+  </dialog>
+
+  <dialog id="settings-dialog">
+    <form method="dialog" class="dialog-card">
+      <header><div><small>可选连接</small><h2>API 与 MCP</h2></div><button class="icon-button" value="cancel">×</button></header>
+      <p class="settings-note">本地文件溯源无需 AI 或 API 即可运行；其他接口只在需要联网检索、法规检索或来源理解时调用。</p>
+      <h3>网页搜索源</h3>
+      <label>搜索提供方<select id="web-provider"><option value="default">默认搜索</option><option value="metaso">秘塔 Search API</option></select></label>
+      <div id="metaso-settings" class="settings-group">
+        <label>秘塔 API Key<input id="metaso-api-key" type="password" placeholder="仅在本次运行期间保留，不写入磁盘"></label>
+        <label>秘塔理解模型<input id="metaso-chat-model" value="fast" placeholder="fast"></label>
+        <label>每个观点的结果数量<input id="metaso-size" type="number" min="1" max="50" value="10"></label>
+        <label class="check-line"><input id="metaso-concise" type="checkbox" checked>返回精简的原文匹配信息</label>
+        <label class="check-line"><input id="metaso-summary" type="checkbox">通过网页的摘要信息进行召回增强</label>
+        <label class="check-line"><input id="metaso-raw" type="checkbox">抓取来源网页原文</label>
+        <div class="hint">搜索接口负责找候选；启用理解层后，问答接口负责生成检索问题。候选的“深读此来源”按次调用问答接口，概括必须绑定来源原文。</div>
+      </div>
+      <h3>北大法宝 MCP</h3>
+      <label>Access Token<input id="pkulaw-token" type="password" placeholder="可粘贴完整 Bearer Token 或纯 Token；仅在本次运行期间保留"></label>
+      <label>法规检索方式<select id="pkulaw-mode"><option value="keyword">法规关键词检索（约25积分，默认）</option><option value="semantic">法规语义检索（约125积分）</option><option value="article">精准法条检索（约25积分）</option></select></label>
+      <label>法规效力范围<select id="pkulaw-timeliness"><option value="current">只检索现行有效（默认）</option><option value="all">包含历史法规</option></select></label>
+      <label>每个观点的结果数量<input id="pkulaw-size" type="number" min="1" max="50" value="10"></label>
+      <div class="hint">默认在请求中限定“现行有效”，并过滤明确标注为失效或废止的结果；效力字段缺失的候选会标注“效力待核验”。返回结果只作为候选，不自动判断适用性。</div>
+      <h3>本地模型（可选智能细分与检索辅助）</h3>
+      <label>本地 OpenAI 兼容 API 地址<input id="local-api-base" placeholder="http://127.0.0.1:1234/v1"></label>
+      <label>本地模型<input id="local-api-model" placeholder="例如本地4B模型名称"></label>
+      <label>本地 API Key（通常可留空）<input id="local-api-key" type="password" placeholder="仅在本次运行期间保留"></label>
+      <div class="hint">“本地 AI 智能细分”只让模型组合程序预切的编号片段，原文由程序重建并校验；适合测试4B及以下指令模型。溯源时若勾选本地 AI 补充检索，模型还会在强匹配不足时扩展短检索词。文件读取、原文定位和候选对齐始终由规则完成。</div>
+      <h3>在线观点结构化模型</h3>
+      <label>OpenAI兼容 API 地址<input id="api-base" placeholder="https://api.openai.com/v1"></label>
+      <label>模型<input id="api-model" placeholder="模型名称"></label>
+      <label>API Key<input id="api-key" type="password" placeholder="仅在本次运行期间保留，不写入磁盘"></label>
+      <h3>MCP资料库</h3>
+      <label>MCP HTTP 地址<input id="mcp-url" placeholder="https://.../mcp"></label>
+      <label>MCP检索工具名<input id="mcp-tool" placeholder="search"></label>
+      <footer><button class="button quiet" value="cancel">取消</button><button type="button" class="button primary" id="save-settings">保存设置</button></footer>
+    </form>
+  </dialog>
+
+  <dialog id="pdf-reader-dialog" class="pdf-reader-dialog">
+    <section class="pdf-reader-card" aria-label="PDF 阅读区">
+      <header class="pdf-reader-head">
+        <div><small>本地来源 PDF</small><h2 id="pdf-reader-title">PDF 阅读</h2></div>
+        <button type="button" class="icon-button" id="pdf-reader-close" aria-label="关闭 PDF 阅读区">×</button>
+      </header>
+      <div class="pdf-reader-controls">
+        <button type="button" class="button quiet small" id="pdf-page-prev">上一页</button>
+        <label>页码 <input id="pdf-page-input" type="number" min="1" value="1"></label>
+        <span id="pdf-page-total">/ 1 页</span>
+        <button type="button" class="button quiet small" id="pdf-page-next">下一页</button>
+        <button type="button" class="button quiet small" id="pdf-open-default">用默认程序打开</button>
+      </div>
+      <p id="pdf-reader-location" class="pdf-reader-location"></p>
+      <div class="pdf-page-stage"><img id="pdf-page-image" alt="PDF 页面预览"></div>
+    </section>
+  </dialog>
+
+  <div id="toast" class="toast"></div>
+  <script src="/app.js"></script>
+  <script src="/interaction.js"></script>
+  <script src="/sources-ui.js"></script>
+</body>
+</html>

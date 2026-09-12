@@ -1,0 +1,66 @@
+.claim-card {
+  cursor: pointer;
+}
+
+.claim-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 9px;
+}
+
+.claim-run {
+  padding: 5px 9px !important;
+  font-size: 12px;
+}
+
+.source-filters {
+  flex-wrap: wrap;
+}
+
+.source-filter {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 5px 8px;
+  color: #5c6864;
+  background: #ecefea;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.source-filter.active {
+  border-color: #315f50;
+  box-shadow: 0 0 0 2px #315f5018;
+}
+
+.source-filter span {
+  margin-left: 3px;
+}
+
+.source-title {
+  min-width: 0;
+  flex: 1;
+}
+
+.source-title b {
+  display: block;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.source-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 7px;
+}
+
+.source-badges span {
+  border-radius: 6px;
+  padding: 2px 6px;
+  background: #eef2ef;
+  color: #5d6965;
+  font-size: 11px;
+}
+.source-modes{grid-template-columns:repeat(2,1fr)}
+.understanding-toggle{background:#eef3ef;border:1px solid #d3ded7;border-radius:10px;padding:10px 12px!important}
+.trace-plan{background:#eef5f1;border:1px solid #cdded5;border-radius:13px;padding:14px;margin-bottom:13px}.trace-plan-head,.reading-title{display:flex;justify-content:space-between;gap:10px}.trace-plan-head span,.reading-title span,.source-reading small{color:#68766f;font-size:11px}.trace-plan p{margin:7px 0}.plan-subclaims{display:flex;flex-wrap:wrap;gap:5px;margin:9px 0}.plan-subclaims span{background:white;border-radius:7px;padding:3px 7px;font-size:11px}.plan-error{color:#9b4b42}.empty-note{padding:25px;color:#6f7b77}.source-reading{margin:13px 0;padding:13px;background:#f0f5f1;border-left:4px solid #4f806e;border-radius:7px}.source-reading>p{font-weight:600}.reading-quote{margin:9px 0}.reading-quote p,.alignment-row blockquote{margin:5px 0;padding:9px;background:#fff;border-left:3px solid #caa455}.alignment-row{display:grid;grid-template-columns:auto 1fr;gap:9px;margin:10px 0}.alignment-row>span{height:max-content;border-radius:999px;background:#e2ebe5;color:#315f50;padding:3px 7px;font-size:11px;font-weight:700}.alignment-row p{margin:4px 0}

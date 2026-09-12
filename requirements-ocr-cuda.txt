@@ -1,0 +1,14 @@
+# Optional CUDA OCR engine for NVIDIA GPUs.
+# Install paddlepaddle-gpu first using the wheel that matches your CUDA runtime;
+# see README for the Windows CUDA 12.6 command used by this project.
+paddleocr==2.10.0
+opencv-contrib-python==4.10.0.84
+shapely
+pyclipper
+lmdb
+rapidfuzz
+# PaddleOCR 2.x imports this package at startup. 1.4.x avoids pulling an
+# unrelated Torch extension into the OCR process on Windows.
+albumentations==1.4.24
+albucore==0.0.23
+fire

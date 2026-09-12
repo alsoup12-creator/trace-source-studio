@@ -1,0 +1,14 @@
+# OCR language models are local runtime dependencies, not source code.
+tessdata/
+
+# Runtime output and caches.
+DATA/
+__pycache__/
+*.pyc
+*.log
+.env
+.env.*
+projects/
+local-indexes/
+*.__trace_tmp_*.docx
+*_溯源修订_*.docx
