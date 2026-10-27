@@ -10,5 +10,8 @@ __pycache__/
 .env.*
 projects/
 local-indexes/
+output/
+config.json
+secrets.json
 *.__trace_tmp_*.docx
 *_溯源修订_*.docx

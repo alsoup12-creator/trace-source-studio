@@ -1,4 +1,12 @@
-# 溯源台结构基线
+# 审核溯源台结构基线
+
+## 当前审核层
+
+启动入口为 `contract_app.py`，复用 `app.py` 原有 API/MCP、来源检索、原文修改和 Word 导出处理。前端附加 `contract-review.js` 及审核样式，保留右栏溯源与底部对话。
+
+`contract_review.py` 负责单文件全文首审及最多两轮全文补查。本地使用文档校对指令，API 使用校对加法律疑点指令；`instructionProfile` 标记审核范围，旧范围 API 任务不会与新范围混合继续。`full_document_context.py` 检查实际容量，`local_review_runtime.py` 负责流式、停止与完整意见保留，`review_locator.py` 在全文中匹配引文并提供待核候选。
+
+模型内容与来源证据独立。法律疑点不表示已经检索法条，定位成功不表示意见正确。以下记录底层来源与修订流程。
 
 ## 1. 产品定义
 

@@ -1,3 +1,3 @@
 @echo off
 cd /d "%~dp0"
-python app.py
+python contract_app.py
